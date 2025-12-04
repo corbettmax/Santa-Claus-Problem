@@ -58,8 +58,8 @@ def santa():
         # Check if reindeer are ready (priority)
         reindeerMutex.acquire()
         if reindeerCount == NUM_REINDEER:
-            print("\n🎅 SANTA: Ho Ho Ho! All reindeer are back!")
-            print("🎅 SANTA: Preparing sleigh for Christmas delivery...")
+            print("\nSANTA: Ho Ho Ho! All reindeer are back!")
+            print("SANTA: Preparing sleigh for Christmas delivery...")
             
             # Release all reindeer to harness
             for i in range(NUM_REINDEER):
@@ -70,8 +70,8 @@ def santa():
             
             time.sleep(0.5)  # Simulate delivery preparation
             deliveries += 1
-            print(f"🎅 SANTA: Sleigh ready! Delivering toys! (Delivery #{deliveries})")
-            print("🎅 SANTA: Going back to sleep...\n")
+            print(f"SANTA: Sleigh ready! Delivering toys! (Delivery #{deliveries})")
+            print("SANTA: Going back to sleep...\n")
             
         else:
             reindeerMutex.release()
@@ -79,8 +79,8 @@ def santa():
             # Check if elves need help
             elfMutex.acquire()
             if elfCount == ELF_GROUP_SIZE:
-                print(f"\n🎅 SANTA: Three elves need help!")
-                print("🎅 SANTA: Meeting with elves...")
+                print(f"\nSANTA: Three elves need help!")
+                print("SANTA: Meeting with elves...")
                 
                 # Release the three elves for consultation
                 for i in range(ELF_GROUP_SIZE):
@@ -91,8 +91,8 @@ def santa():
                 
                 time.sleep(0.3)  # Simulate consultation
                 elfConsultations += 1
-                print(f"🎅 SANTA: Consultation complete! (Session #{elfConsultations})")
-                print("🎅 SANTA: Going back to sleep...\n")
+                print(f"SANTA: Consultation complete! (Session #{elfConsultations})")
+                print("SANTA: Going back to sleep...\n")
             else:
                 elfMutex.release()
         
@@ -103,23 +103,23 @@ def reindeer(id):
     while True:
         # Vacation in the tropics
         time.sleep(random.uniform(2, 5))
-        print(f"🦌 Reindeer {id}: Returning from vacation")
+        print(f"Reindeer {id}: Returning from vacation")
         
         reindeerMutex.acquire()
         global reindeerCount
         reindeerCount += 1
         
         if reindeerCount == NUM_REINDEER:
-            print(f"🦌 Reindeer {id}: I'm the last one! Waking Santa!")
+            print(f"Reindeer {id}: I'm the last one! Waking Santa!")
             santaSem.release()  # Wake Santa
         
         reindeerMutex.release()
         
         # Wait to be harnessed
         reindeerSem.acquire()
-        print(f"🦌 Reindeer {id}: Getting harnessed to sleigh")
+        print(f"Reindeer {id}: Getting harnessed to sleigh")
         time.sleep(0.1)
-        print(f"🦌 Reindeer {id}: Harnessed! Ready to deliver toys!")
+        print(f"Reindeer {id}: Harnessed! Ready to deliver toys!")
 
 def elf(id):
     """Elf thread - occasionally needs Santa's help"""
@@ -132,24 +132,24 @@ def elf(id):
         waitingElves += 1
         
         if waitingElves == ELF_GROUP_SIZE:
-            print(f"🧝 Elf {id}: We have 3 elves waiting! Waking Santa!")
+            print(f"Elf {id}: We have 3 elves waiting! Waking Santa!")
             elfCount = ELF_GROUP_SIZE
             waitingElves = 0
             santaSem.release()  # Wake Santa
         else:
-            print(f"🧝 Elf {id}: Waiting for help (Total waiting: {waitingElves})")
+            print(f"Elf {id}: Waiting for help (Total waiting: {waitingElves})")
         
         elfMutex.release()
         
         # Wait for consultation
         elfSem.acquire()
-        print(f"🧝 Elf {id}: Getting help from Santa...")
+        print(f"Elf {id}: Getting help from Santa...")
         time.sleep(0.1)
-        print(f"🧝 Elf {id}: Problem solved! Back to work!")
+        print(f"Elf {id}: Problem solved! Back to work!")
 
 def main():
     print("=" * 60)
-    print("🎄 SANTA CLAUS PROBLEM - PYTHON IMPLEMENTATION 🎄")
+    print("SANTA CLAUS PROBLEM - PYTHON IMPLEMENTATION")
     print("=" * 60)
     print(f"Configuration:")
     print(f"  - Number of Reindeer: {NUM_REINDEER}")
@@ -181,7 +181,7 @@ def main():
     try:
         time.sleep(30)
         print("\n" + "=" * 60)
-        print("🎄 Simulation Complete! 🎄")
+        print("Simulation Complete!")
         print("=" * 60)
     except KeyboardInterrupt:
         print("\n\nSimulation interrupted by user.")

@@ -1,0 +1,129 @@
+{
+  "test_cases": [
+    {
+      "name": "Basic Functionality Test",
+      "description": "Run with default configuration to verify basic operations",
+      "config": {
+        "num_reindeer": 9,
+        "num_elves": 10,
+        "elf_group_size": 3,
+        "simulation_time": 30
+      },
+      "expected_behavior": [
+        "Santa wakes when all 9 reindeer return",
+        "Santa wakes when 3 elves form a group",
+        "Reindeer have priority over elves",
+        "At least 1 delivery occurs",
+        "At least 1 elf consultation occurs"
+      ]
+    },
+    {
+      "name": "Short Duration Test",
+      "description": "Quick test to verify compilation and basic execution",
+      "config": {
+        "num_reindeer": 9,
+        "num_elves": 10,
+        "elf_group_size": 3,
+        "simulation_time": 10
+      },
+      "expected_behavior": [
+        "Program compiles/runs without errors",
+        "Threads start successfully",
+        "Clean termination after 10 seconds"
+      ]
+    },
+    {
+      "name": "Extended Duration Test",
+      "description": "Longer run to test stability and multiple cycles",
+      "config": {
+        "num_reindeer": 9,
+        "num_elves": 10,
+        "elf_group_size": 3,
+        "simulation_time": 60
+      },
+      "expected_behavior": [
+        "Multiple deliveries occur",
+        "Multiple elf consultations occur",
+        "No deadlocks observed",
+        "No race conditions detected"
+      ]
+    },
+    {
+      "name": "High Elf Contention Test",
+      "description": "More elves to test group formation and waiting",
+      "config": {
+        "num_reindeer": 9,
+        "num_elves": 20,
+        "elf_group_size": 3,
+        "simulation_time": 30
+      },
+      "expected_behavior": [
+        "Multiple elf groups form",
+        "Elves wait correctly when group not full",
+        "No more than 3 elves in consultation at once"
+      ]
+    },
+    {
+      "name": "Minimum Configuration Test",
+      "description": "Test with minimum viable configuration",
+      "config": {
+        "num_reindeer": 9,
+        "num_elves": 3,
+        "elf_group_size": 3,
+        "simulation_time": 20
+      },
+      "expected_behavior": [
+        "Works with minimum number of elves",
+        "Exactly one elf group can form",
+        "Reindeer still have priority"
+      ]
+    },
+    {
+      "name": "Priority Test",
+      "description": "Verify reindeer always have priority over waiting elves",
+      "config": {
+        "num_reindeer": 9,
+        "num_elves": 15,
+        "elf_group_size": 3,
+        "simulation_time": 40
+      },
+      "expected_behavior": [
+        "When both groups waiting, reindeer serviced first",
+        "Elves eventually get help (no starvation in short term)",
+        "Priority mechanism works correctly"
+      ]
+    }
+  ],
+  "validation_criteria": {
+    "correctness": [
+      "Exactly 9 reindeer must return before delivery",
+      "Exactly 3 elves must wait before consultation",
+      "Santa never services two groups simultaneously",
+      "Counters reset properly after each service"
+    ],
+    "synchronization": [
+      "No race conditions on shared counters",
+      "Proper mutual exclusion maintained",
+      "No deadlocks occur",
+      "Threads coordinate correctly via semaphores"
+    ],
+    "priority": [
+      "Reindeer always serviced before waiting elves",
+      "Priority check happens atomically",
+      "No priority inversion occurs"
+    ],
+    "termination": [
+      "Program terminates cleanly after time limit",
+      "All resources properly cleaned up",
+      "No zombie threads remain"
+    ]
+  },
+  "performance_metrics": {
+    "track": [
+      "Total number of deliveries",
+      "Total number of elf consultations",
+      "Average wait time (if measurable)",
+      "Execution time accuracy"
+    ]
+  }
+}

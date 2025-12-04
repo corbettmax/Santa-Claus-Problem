@@ -16,6 +16,8 @@
  * 5. reindeerMutex - Protects reindeer counter
  * 6. elfMutex - Protects elf counter
  * 7. santaMutex - Ensures Santa handles one group at a time
+ * 
+ * This is better the Trono's original solution as it avoids deadlocks and ensures proper prioritization.
  */
 
 import java.util.concurrent.Semaphore;
@@ -55,7 +57,7 @@ public class SantaClaus {
      */
     static class Santa extends Thread {
         public void run() {
-            System.out.println("🎅 SANTA: Starting my shift at the North Pole!");
+            System.out.println("SANTA: Starting shift at the North Pole");
 
             while (!Thread.interrupted()) {
                 try {
@@ -66,8 +68,8 @@ public class SantaClaus {
                     // Check if reindeer are ready (priority)
                     reindeerMutex.acquire();
                     if (reindeerCount == NUM_REINDEER) {
-                        System.out.println("\n🎅 SANTA: Ho Ho Ho! All reindeer are back!");
-                        System.out.println("🎅 SANTA: Preparing sleigh for Christmas delivery...");
+                        System.out.println("\nSANTA: Ho Ho Ho! All reindeer are back!");
+                        System.out.println("SANTA: Preparing sleigh for Christmas delivery...");
 
                         // Release all reindeer to harness
                         for (int i = 0; i < NUM_REINDEER; i++) {
@@ -79,8 +81,8 @@ public class SantaClaus {
 
                         Thread.sleep(500); // Simulate delivery preparation
                         deliveries++;
-                        System.out.println("🎅 SANTA: Sleigh ready! Delivering toys! (Delivery #" + deliveries + ")");
-                        System.out.println("🎅 SANTA: Going back to sleep...\n");
+                        System.out.println("SANTA: Sleigh ready! Delivering toys! (Delivery #" + deliveries + ")");
+                        System.out.println("SANTA: Going back to sleep...\n");
 
                     } else {
                         reindeerMutex.release();
@@ -88,8 +90,8 @@ public class SantaClaus {
                         // Check if elves need help
                         elfMutex.acquire();
                         if (elfCount == ELF_GROUP_SIZE) {
-                            System.out.println("\n🎅 SANTA: Three elves need help!");
-                            System.out.println("🎅 SANTA: Meeting with elves...");
+                            System.out.println("\nSANTA: Three elves need help!");
+                            System.out.println("SANTA: Meeting with elves...");
 
                             // Release the three elves for consultation
                             for (int i = 0; i < ELF_GROUP_SIZE; i++) {
@@ -101,8 +103,8 @@ public class SantaClaus {
 
                             Thread.sleep(300); // Simulate consultation
                             elfConsultations++;
-                            System.out.println("🎅 SANTA: Consultation complete! (Session #" + elfConsultations + ")");
-                            System.out.println("🎅 SANTA: Going back to sleep...\n");
+                            System.out.println("SANTA: Consultation complete! (Session #" + elfConsultations + ")");
+                            System.out.println("SANTA: Going back to sleep...\n");
                         } else {
                             elfMutex.release();
                         }
@@ -132,13 +134,13 @@ public class SantaClaus {
                 try {
                     // Vacation in the tropics
                     Thread.sleep(2000 + random.nextInt(3000));
-                    System.out.println("🦌 Reindeer " + id + ": Returning from vacation");
+                    System.out.println("Reindeer " + id + ": Returning from vacation");
 
                     reindeerMutex.acquire();
                     reindeerCount++;
 
                     if (reindeerCount == NUM_REINDEER) {
-                        System.out.println("🦌 Reindeer " + id + ": I'm the last one! Waking Santa!");
+                        System.out.println("Reindeer " + id + ": I'm the last one! Waking Santa!");
                         santaSem.release(); // Wake Santa
                     }
 
@@ -146,9 +148,9 @@ public class SantaClaus {
 
                     // Wait to be harnessed
                     reindeerSem.acquire();
-                    System.out.println("🦌 Reindeer " + id + ": Getting harnessed to sleigh");
+                    System.out.println("Reindeer " + id + ": Getting harnessed to sleigh");
                     Thread.sleep(100);
-                    System.out.println("🦌 Reindeer " + id + ": Harnessed! Ready to deliver toys!");
+                    System.out.println("Reindeer " + id + ": Harnessed! Ready to deliver toys!");
 
                 } catch (InterruptedException e) {
                     break;
@@ -177,21 +179,21 @@ public class SantaClaus {
                     waitingElves++;
 
                     if (waitingElves == ELF_GROUP_SIZE) {
-                        System.out.println("🧝 Elf " + id + ": We have 3 elves waiting! Waking Santa!");
+                        System.out.println("Elf " + id + ": We have 3 elves waiting! Waking Santa!");
                         elfCount = ELF_GROUP_SIZE;
                         waitingElves = 0;
                         santaSem.release(); // Wake Santa
                     } else {
-                        System.out.println("🧝 Elf " + id + ": Waiting for help (Total waiting: " + waitingElves + ")");
+                        System.out.println("Elf " + id + ": Waiting for help (Total waiting: " + waitingElves + ")");
                     }
 
                     elfMutex.release();
 
                     // Wait for consultation
                     elfSem.acquire();
-                    System.out.println("🧝 Elf " + id + ": Getting help from Santa...");
+                    System.out.println("Elf " + id + ": Getting help from Santa...");
                     Thread.sleep(100);
-                    System.out.println("🧝 Elf " + id + ": Problem solved! Back to work!");
+                    System.out.println("Elf " + id + ": Problem solved! Back to work!");
 
                 } catch (InterruptedException e) {
                     break;
@@ -202,7 +204,7 @@ public class SantaClaus {
 
     public static void main(String[] args) {
         System.out.println("============================================================");
-        System.out.println("🎄 SANTA CLAUS PROBLEM - JAVA IMPLEMENTATION 🎄");
+        System.out.println("SANTA CLAUS PROBLEM - JAVA IMPLEMENTATION");
         System.out.println("============================================================");
         System.out.println("Configuration:");
         System.out.println("  - Number of Reindeer: " + NUM_REINDEER);
@@ -241,7 +243,7 @@ public class SantaClaus {
         }
 
         System.out.println("\n============================================================");
-        System.out.println("🎄 Simulation Complete! 🎄");
+        System.out.println("Simulation Complete!");
         System.out.println("============================================================");
         System.out.println("Statistics:");
         System.out.println("  - Total Deliveries: " + deliveries);

@@ -16,6 +16,8 @@
  * 5. reindeer_mutex - Protects reindeer counter
  * 6. elf_mutex - Protects elf counter
  * 7. santa_mutex - Ensures Santa handles one group at a time
+ * 
+ * This is better the Trono's original solution as it avoids deadlocks and ensures proper prioritization.
  */
 
 #include <stdio.h>
@@ -55,7 +57,7 @@ int randomSleepMs(int minMs, int maxMs) {
 }
 
 void *santaThread(void *arg) {
-    printf("🎅 SANTA: Starting my shift at the North Pole!\n");
+    printf("SANTA: Starting shift at the North Pole\n");
     
     while (1) {
         // Wait to be woken up
@@ -66,8 +68,8 @@ void *santaThread(void *arg) {
         // Check if reindeer are ready (priority)
         pthread_mutex_lock(&reindeerMutex);
         if (reindeerCount == NUM_REINDEER) {
-            printf("\n🎅 SANTA: Ho Ho Ho! All reindeer are back!\n");
-            printf("🎅 SANTA: Preparing sleigh for Christmas delivery...\n");
+            printf("\nSANTA: Ho Ho Ho! All reindeer are back!\n");
+            printf("SANTA: Preparing sleigh for Christmas delivery...\n");
             
             // Release all reindeer to harness
             for (int i = 0; i < NUM_REINDEER; i++) {
@@ -79,8 +81,8 @@ void *santaThread(void *arg) {
             
             usleep(500000);  // 0.5 seconds
             deliveries++;
-            printf("🎅 SANTA: Sleigh ready! Delivering toys! (Delivery #%d)\n", deliveries);
-            printf("🎅 SANTA: Going back to sleep...\n\n");
+            printf("SANTA: Sleigh ready! Delivering toys! (Delivery #%d)\n", deliveries);
+            printf("SANTA: Going back to sleep...\n\n");
             
         } else {
             pthread_mutex_unlock(&reindeerMutex);
@@ -88,8 +90,8 @@ void *santaThread(void *arg) {
             // Check if elves need help
             pthread_mutex_lock(&elfMutex);
             if (elfCount == ELF_GROUP_SIZE) {
-                printf("\n🎅 SANTA: Three elves need help!\n");
-                printf("🎅 SANTA: Meeting with elves...\n");
+                printf("\nSANTA: Three elves need help!\n");
+                printf("SANTA: Meeting with elves...\n");
                 
                 // Release the three elves for consultation
                 for (int i = 0; i < ELF_GROUP_SIZE; i++) {
@@ -101,8 +103,8 @@ void *santaThread(void *arg) {
                 
                 usleep(300000);  // 0.3 seconds
                 elfConsultations++;
-                printf("🎅 SANTA: Consultation complete! (Session #%d)\n", elfConsultations);
-                printf("🎅 SANTA: Going back to sleep...\n\n");
+                printf("SANTA: Consultation complete! (Session #%d)\n", elfConsultations);
+                printf("SANTA: Going back to sleep...\n\n");
             } else {
                 pthread_mutex_unlock(&elfMutex);
             }
@@ -121,13 +123,13 @@ void *reindeerThread(void *arg) {
     while (1) {
         // Vacation in the tropics
         usleep(randomSleepMs(2000, 5000) * 1000);
-        printf("🦌 Reindeer %d: Returning from vacation\n", id);
+        printf("Reindeer %d: Returning from vacation\n", id);
         
         pthread_mutex_lock(&reindeerMutex);
         reindeerCount++;
         
         if (reindeerCount == NUM_REINDEER) {
-            printf("🦌 Reindeer %d: I'm the last one! Waking Santa!\n", id);
+            printf("Reindeer %d: I'm the last one! Waking Santa!\n", id);
             sem_post(&santaSem);  // Wake Santa
         }
         
@@ -135,9 +137,9 @@ void *reindeerThread(void *arg) {
         
         // Wait to be harnessed
         sem_wait(&reindeerSem);
-        printf("🦌 Reindeer %d: Getting harnessed to sleigh\n", id);
+        printf("Reindeer %d: Getting harnessed to sleigh\n", id);
         usleep(100000);  // 0.1 seconds
-        printf("🦌 Reindeer %d: Harnessed! Ready to deliver toys!\n", id);
+        printf("Reindeer %d: Harnessed! Ready to deliver toys!\n", id);
     }
     
     return NULL;
@@ -155,21 +157,21 @@ void *elfThread(void *arg) {
         waitingElves++;
         
         if (waitingElves == ELF_GROUP_SIZE) {
-            printf("🧝 Elf %d: We have 3 elves waiting! Waking Santa!\n", id);
+            printf("Elf %d: We have 3 elves waiting! Waking Santa!\n", id);
             elfCount = ELF_GROUP_SIZE;
             waitingElves = 0;
             sem_post(&santaSem);  // Wake Santa
         } else {
-            printf("🧝 Elf %d: Waiting for help (Total waiting: %d)\n", id, waitingElves);
+            printf("Elf %d: Waiting for help (Total waiting: %d)\n", id, waitingElves);
         }
         
         pthread_mutex_unlock(&elfMutex);
         
         // Wait for consultation
         sem_wait(&elfSem);
-        printf("🧝 Elf %d: Getting help from Santa...\n", id);
+        printf("Elf %d: Getting help from Santa...\n", id);
         usleep(100000);  // 0.1 seconds
-        printf("🧝 Elf %d: Problem solved! Back to work!\n", id);
+        printf("Elf %d: Problem solved! Back to work!\n", id);
     }
     
     return NULL;
@@ -179,7 +181,7 @@ int main() {
     srand(time(NULL));
     
     printf("============================================================\n");
-    printf("🎄 SANTA CLAUS PROBLEM - C IMPLEMENTATION 🎄\n");
+    printf("SANTA CLAUS PROBLEM - C IMPLEMENTATION\n");
     printf("============================================================\n");
     printf("Configuration:\n");
     printf("  - Number of Reindeer: %d\n", NUM_REINDEER);
@@ -219,7 +221,7 @@ int main() {
     sleep(SIMULATION_TIME);
     
     printf("\n============================================================\n");
-    printf("🎄 Simulation Complete! 🎄\n");
+    printf("Simulation Complete!\n");
     printf("============================================================\n");
     printf("Statistics:\n");
     printf("  - Total Deliveries: %d\n", deliveries);
