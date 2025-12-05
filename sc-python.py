@@ -46,6 +46,7 @@ ELF_GROUP_SIZE = 3
 
 def santa():
     """Santa's main loop - waits to be woken by reindeer or elves"""
+    global reindeerCount, elfCount
     deliveries = 0
     elfConsultations = 0
     
@@ -53,6 +54,7 @@ def santa():
         # Wait to be woken up
         santaSem.acquire()
         
+        # Ensure Santa handles one group at a time
         santaMutex.acquire()
         
         # Check if reindeer are ready (priority)
@@ -61,11 +63,13 @@ def santa():
             print("\nSANTA: Ho Ho Ho! All reindeer are back!")
             print("SANTA: Preparing sleigh for Christmas delivery...")
             
+            # Reset counter BEFORE releasing reindeer to prevent double-counting
+            reindeerCount = 0
+            
             # Release all reindeer to harness
             for i in range(NUM_REINDEER):
                 reindeerSem.release()
             
-            reindeerCount = 0
             reindeerMutex.release()
             
             time.sleep(0.5)  # Simulate delivery preparation
@@ -82,11 +86,13 @@ def santa():
                 print(f"\nSANTA: Three elves need help!")
                 print("SANTA: Meeting with elves...")
                 
+                # Reset counter BEFORE releasing elves
+                elfCount = 0
+                
                 # Release the three elves for consultation
                 for i in range(ELF_GROUP_SIZE):
                     elfSem.release()
                 
-                elfCount = 0
                 elfMutex.release()
                 
                 time.sleep(0.3)  # Simulate consultation

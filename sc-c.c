@@ -71,12 +71,14 @@ void *santaThread(void *arg) {
             printf("\nSANTA: Ho Ho Ho! All reindeer are back!\n");
             printf("SANTA: Preparing sleigh for Christmas delivery...\n");
             
+            // Reset counter BEFORE releasing reindeer to prevent double-counting
+            reindeerCount = 0;
+            
             // Release all reindeer to harness
             for (int i = 0; i < NUM_REINDEER; i++) {
                 sem_post(&reindeerSem);
             }
             
-            reindeerCount = 0;
             pthread_mutex_unlock(&reindeerMutex);
             
             usleep(500000);  // 0.5 seconds
@@ -93,12 +95,14 @@ void *santaThread(void *arg) {
                 printf("\nSANTA: Three elves need help!\n");
                 printf("SANTA: Meeting with elves...\n");
                 
+                // Reset counter BEFORE releasing elves to prevent double-counting
+                elfCount = 0;
+                
                 // Release the three elves for consultation
                 for (int i = 0; i < ELF_GROUP_SIZE; i++) {
                     sem_post(&elfSem);
                 }
                 
-                elfCount = 0;
                 pthread_mutex_unlock(&elfMutex);
                 
                 usleep(300000);  // 0.3 seconds

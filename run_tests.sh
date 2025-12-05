@@ -315,4 +315,4 @@ fi
 # Cleanup Java and C iles
 ################################################################################
 
-# rm -f sc-c SantaClaus.class
+rm -f sc-c SantaClaus.class
