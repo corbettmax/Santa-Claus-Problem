@@ -92,6 +92,78 @@
         "Elves eventually get help (no starvation in short term)",
         "Priority mechanism works correctly"
       ]
+    },
+    {
+      "name": "Rapid Cycling Test",
+      "description": "Test with minimal sleep times to maximize contention and expose race conditions",
+      "config": {
+        "num_reindeer": 9,
+        "num_elves": 12,
+        "elf_group_size": 3,
+        "simulation_time": 25
+      },
+      "expected_behavior": [
+        "High frequency of wake-up events",
+        "Race conditions properly handled",
+        "Counters remain accurate under high contention",
+        "No double-counting occurs",
+        "Priority still enforced with rapid cycling",
+        "Multiple deliveries and consultations occur"
+      ]
+    },
+    {
+      "name": "Reindeer Dominance Test",
+      "description": "Test elf starvation prevention when reindeer return very frequently",
+      "config": {
+        "num_reindeer": 9,
+        "num_elves": 6,
+        "elf_group_size": 3,
+        "simulation_time": 35
+      },
+      "expected_behavior": [
+        "Reindeer return frequently due to short vacations",
+        "Elves still get consultations despite reindeer priority",
+        "No elf starvation occurs",
+        "System remains fair to both groups",
+        "At least some elf consultations happen"
+      ]
+    },
+    {
+      "name": "Barrier Synchronization Test",
+      "description": "Verify all group members complete operations before next cycle begins",
+      "config": {
+        "num_reindeer": 9,
+        "num_elves": 9,
+        "elf_group_size": 3,
+        "simulation_time": 30
+      },
+      "expected_behavior": [
+        "All 9 reindeer complete harnessing before any return to vacation",
+        "All 3 elves complete consultation before new group forms",
+        "No overlapping delivery cycles",
+        "No overlapping consultation sessions",
+        "Counter resets happen at correct times",
+        "No reindeer counted in multiple simultaneous deliveries"
+      ]
+    },
+    {
+      "name": "Maximum Load Stress Test",
+      "description": "Extended test with maximum elves to test system limits and stability",
+      "config": {
+        "num_reindeer": 9,
+        "num_elves": 30,
+        "elf_group_size": 3,
+        "simulation_time": 45
+      },
+      "expected_behavior": [
+        "System handles 30 concurrent elf threads",
+        "Group formation works with high elf count",
+        "Multiple elf groups can wait and form sequentially",
+        "No thread starvation with large thread pool",
+        "Performance remains stable",
+        "Memory usage remains constant",
+        "Clean termination with many threads"
+      ]
     }
   ],
   "validation_criteria": {
@@ -99,13 +171,17 @@
       "Exactly 9 reindeer must return before delivery",
       "Exactly 3 elves must wait before consultation",
       "Santa never services two groups simultaneously",
-      "Counters reset properly after each service"
+      "Counters reset properly after each service",
+      "No reindeer counted in multiple deliveries simultaneously",
+      "No elves counted in multiple consultations simultaneously"
     ],
     "synchronization": [
       "No race conditions on shared counters",
       "Proper mutual exclusion maintained",
       "No deadlocks occur",
-      "Threads coordinate correctly via semaphores"
+      "Threads coordinate correctly via semaphores",
+      "Lock acquisition follows consistent ordering",
+      "No lost wake-ups"
     ],
     "priority": [
       "Reindeer always serviced before waiting elves",
@@ -116,14 +192,57 @@
       "Program terminates cleanly after time limit",
       "All resources properly cleaned up",
       "No zombie threads remain"
+    ],
+    "barrier_synchronization": [
+      "All reindeer complete harnessing before any go on vacation",
+      "All elves in group complete consultation before counter resets",
+      "No overlapping delivery or consultation cycles",
+      "Counter resets occur before next group can form"
+    ],
+    "fairness": [
+      "No thread starvation over test duration",
+      "All elves get opportunities to form groups",
+      "Waiting elves eventually get help",
+      "No single elf monopolizes consultations"
     ]
   },
   "performance_metrics": {
     "track": [
       "Total number of deliveries",
       "Total number of elf consultations",
+      "Total reindeer returns (should be ~9x deliveries with some overhead)",
+      "Ratio of returns to deliveries (efficiency metric)",
       "Average wait time (if measurable)",
       "Execution time accuracy"
-    ]
+    ],
+    "acceptable_ranges": {
+      "returns_to_deliveries_ratio": {
+        "min": 9.0,
+        "max": 15.0,
+        "description": "Each delivery needs 9 reindeer; ratio >15 indicates excessive churn"
+      },
+      "elves_waiting_simultaneously": {
+        "max": 27,
+        "description": "With 30 elves and groups of 3, max 27 could wait while 3 consult"
+      }
+    }
+  },
+  "implementation_notes": {
+    "python": {
+      "notes": "May show higher returns-to-deliveries ratio due to GIL scheduling",
+      "known_issues": "Daemon threads may not always clean up perfectly on SIGINT"
+    },
+    "c": {
+      "notes": "Lowest overhead, most efficient thread scheduling",
+      "known_issues": "Manual memory management requires careful testing for leaks"
+    },
+    "java": {
+      "notes": "Monitor-based implementation may show different timing characteristics",
+      "known_issues": "JVM warmup may affect first few seconds of timing"
+    },
+    "go": {
+      "notes": "Goroutines provide excellent concurrency, may see best performance",
+      "known_issues": "Goroutine scheduling differs from traditional threads"
+    }
   }
 }

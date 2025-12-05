@@ -25,6 +25,7 @@ NC='\033[0m' # No Color
 RUN_PYTHON=true
 RUN_C=true
 RUN_JAVA=true
+RUN_GO=true
 TEST_MODE="all"
 
 # Parse command line arguments
@@ -39,14 +40,22 @@ while [[ $# -gt 0 ]]; do
                 python)
                     RUN_C=false
                     RUN_JAVA=false
+                    RUN_GO=false
                     ;;
                 c)
                     RUN_PYTHON=false
                     RUN_JAVA=false
+                    RUN_GO=false
                     ;;
                 java)
                     RUN_PYTHON=false
                     RUN_C=false
+                    RUN_GO=false
+                    ;;
+                go)
+                    RUN_PYTHON=false
+                    RUN_C=false
+                    RUN_JAVA=false
                     ;;
                 *)
                     echo "Unknown language: $2"
@@ -129,6 +138,10 @@ run_test() {
             ;;
         Java)
             timeout $((duration + 5)) java SantaClaus > "$output_file" 2>&1
+            local exit_code=$?
+            ;;
+        Go)
+            timeout $((duration + 5)) ./santaclause > "$output_file" 2>&1
             local exit_code=$?
             ;;
     esac
@@ -226,6 +239,19 @@ if [ "$RUN_JAVA" = true ]; then
     fi
 fi
 
+# Compile Go program
+if [ "$RUN_GO" = true ]; then
+    print_info "Compiling Go implementation..."
+    if go build -o santaclause santaclause.go 2> "$RESULTS_DIR/go_compile.log"; then
+        print_success "Go compilation successful"
+        log_message "Go compilation: SUCCESS"
+    else
+        print_error "Go compilation failed (see $RESULTS_DIR/go_compile.log)"
+        log_message "Go compilation: FAILED"
+        RUN_GO=false
+    fi
+fi
+
 # Check Python
 if [ "$RUN_PYTHON" = true ]; then
     print_info "Checking Python availability..."
@@ -263,6 +289,11 @@ if [ "$RUN_JAVA" = true ]; then
     [ $? -eq 0 ] && analyze_output "$RESULTS_DIR/java_short_${TIMESTAMP}.txt" "Java"
 fi
 
+if [ "$RUN_GO" = true ]; then
+    run_test "Go" "Short Duration Test" 10 "$RESULTS_DIR/go_short_${TIMESTAMP}.txt"
+    [ $? -eq 0 ] && analyze_output "$RESULTS_DIR/go_short_${TIMESTAMP}.txt" "Go"
+fi
+
 # Only run full tests if not in quick mode
 if [ "$TEST_MODE" != "quick" ]; then
     echo ""
@@ -282,6 +313,11 @@ if [ "$TEST_MODE" != "quick" ]; then
     if [ "$RUN_JAVA" = true ]; then
         run_test "Java" "Basic Functionality" 30 "$RESULTS_DIR/java_basic_${TIMESTAMP}.txt"
         [ $? -eq 0 ] && analyze_output "$RESULTS_DIR/java_basic_${TIMESTAMP}.txt" "Java"
+    fi
+    
+    if [ "$RUN_GO" = true ]; then
+        run_test "Go" "Basic Functionality" 30 "$RESULTS_DIR/go_basic_${TIMESTAMP}.txt"
+        [ $? -eq 0 ] && analyze_output "$RESULTS_DIR/go_basic_${TIMESTAMP}.txt" "Go"
     fi
     
     # Test Case 3: Extended Duration Test (60s)
@@ -312,7 +348,7 @@ else
 fi
 
 ################################################################################
-# Cleanup Java and C iles
+# Cleanup compiled files
 ################################################################################
 
-rm -f sc-c SantaClaus.class
+rm -f sc-c SantaClaus.class santaclause

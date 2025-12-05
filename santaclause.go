@@ -60,7 +60,7 @@ func randomSleepMs(minMs, maxMs int) time.Duration {
 // Description: Santa's main loop
 func santaThread(wg *sync.WaitGroup) {
 	defer wg.Done()
-	fmt.Println("🎅 SANTA: Starting my shift at the North Pole!")
+	fmt.Println("SANTA: Starting my shift at the North Pole!")
 
 	for {
 		// Wait Semaphore
@@ -69,8 +69,8 @@ func santaThread(wg *sync.WaitGroup) {
 		// Check reindeer first (priority)
 		reindeerMutex.Lock()
 		if reindeerCount == NUM_REINDEER {
-			fmt.Println("\n🎅 SANTA: Ho Ho Ho! All reindeer are back!")
-			fmt.Println("🎅 SANTA: Preparing sleigh for Christmas delivery...")
+			fmt.Println("\nSANTA: Ho Ho Ho! All reindeer are back!")
+			fmt.Println("SANTA: Preparing sleigh for Christmas delivery...")
 
 			// Release all reindeer to harness
 			for i := 0; i < NUM_REINDEER; i++ {
@@ -85,8 +85,8 @@ func santaThread(wg *sync.WaitGroup) {
 			deliveries++
 			statsMutex.Unlock()
 
-			fmt.Printf("🎅 SANTA: Sleigh ready! Delivering toys! (Delivery #%d)\n", deliveries)
-			fmt.Println("🎅 SANTA: Going back to sleep...\n")
+			fmt.Printf("SANTA: Sleigh ready! Delivering toys! (Delivery #%d)\n", deliveries)
+			fmt.Println("SANTA: Going back to sleep...\n")
 
 			continue
 		}
@@ -95,8 +95,8 @@ func santaThread(wg *sync.WaitGroup) {
 		// Check elves
 		elfMutex.Lock()
 		if elfCount == ELF_GROUP_SIZE {
-			fmt.Println("\n🎅 SANTA: Three elves need help!")
-			fmt.Println("🎅 SANTA: Meeting with elves...")
+			fmt.Println("\nSANTA: Three elves need help!")
+			fmt.Println("SANTA: Meeting with elves...")
 
 			// Release the three elves for consultation
 			for i := 0; i < ELF_GROUP_SIZE; i++ {
@@ -111,8 +111,8 @@ func santaThread(wg *sync.WaitGroup) {
 			elfConsultations++
 			statsMutex.Unlock()
 
-			fmt.Printf("🎅 SANTA: Consultation complete! (Session #%d)\n", elfConsultations)
-			fmt.Println("🎅 SANTA: Going back to sleep...\n")
+			fmt.Printf("SANTA: Consultation complete! (Session #%d)\n", elfConsultations)
+			fmt.Println("SANTA: Going back to sleep...\n")
 		} else {
 			elfMutex.Unlock()
 		}
@@ -127,12 +127,12 @@ func reindeerThread(id int, wg *sync.WaitGroup) {
 		// Vacation in the tropics
 		time.Sleep(randomSleepMs(2000, 5000))
 
-		fmt.Printf("🦌 Reindeer %d: Returning from vacation\n", id)
+		fmt.Printf("Reindeer %d: Returning from vacation\n", id)
 
 		reindeerMutex.Lock()
 		reindeerCount++
 		if reindeerCount == NUM_REINDEER {
-			fmt.Printf("🦌 Reindeer %d: I'm the last one! Waking Santa!\n", id)
+			fmt.Printf("Reindeer %d: I'm the last one! Waking Santa!\n", id)
 			// Wake Santa (non-blocking send to avoid blocking if already signalled)
 			select {
 			case santaSem <- struct{}{}:
@@ -143,9 +143,9 @@ func reindeerThread(id int, wg *sync.WaitGroup) {
 
 		// Wait to be harnessed
 		<-reindeerSem
-		fmt.Printf("🦌 Reindeer %d: Getting harnessed to sleigh\n", id)
+		fmt.Printf("Reindeer %d: Getting harnessed to sleigh\n", id)
 		time.Sleep(100 * time.Millisecond)
-		fmt.Printf("🦌 Reindeer %d: Harnessed! Ready to deliver toys!\n", id)
+		fmt.Printf("Reindeer %d: Harnessed! Ready to deliver toys!\n", id)
 	}
 }
 
@@ -161,7 +161,7 @@ func elfThread(id int, wg *sync.WaitGroup) {
 		waitingElves++
 		// If 3 elves are waiting, wake Santa
 		if waitingElves == ELF_GROUP_SIZE {
-			fmt.Printf("🧝 Elf %d: We have 3 elves waiting! Waking Santa!\n", id)
+			fmt.Printf(" Elf %d: We have 3 elves waiting! Waking Santa!\n", id)
 			elfCount = ELF_GROUP_SIZE
 			waitingElves = 0
 			// Wake Santa (non-blocking)
@@ -171,15 +171,15 @@ func elfThread(id int, wg *sync.WaitGroup) {
 			}
 			// Else just print waiting status
 		} else {
-			fmt.Printf("🧝 Elf %d: Waiting for help (Total waiting: %d)\n", id, waitingElves)
+			fmt.Printf("Elf %d: Waiting for help (Total waiting: %d)\n", id, waitingElves)
 		}
 		elfMutex.Unlock()
 
 		// Wait Semaphore elf help
 		<-elfSem
-		fmt.Printf("🧝 Elf %d: Getting help from Santa...\n", id)
+		fmt.Printf("Elf %d: Getting help from Santa...\n", id)
 		time.Sleep(100 * time.Millisecond)
-		fmt.Printf("🧝 Elf %d: Problem solved! Back to work!\n", id)
+		fmt.Printf("Elf %d: Problem solved! Back to work!\n", id)
 	}
 }
 
@@ -187,7 +187,7 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	fmt.Println("============================================================")
-	fmt.Println("🎄 SANTA CLAUS PROBLEM - Go Implementation 🎄")
+	fmt.Println(" SANTA CLAUS PROBLEM - Go Implementation ")
 	fmt.Println("============================================================")
 	fmt.Printf("Configuration:\n")
 	fmt.Printf("  - Number of Reindeer: %d\n", NUM_REINDEER)
@@ -225,7 +225,7 @@ func main() {
 
 	// Print statistics (note: GoRoutines are not explicitly stopped; process exits)
 	fmt.Println("\n============================================================")
-	fmt.Println("🎄 Simulation Complete! 🎄")
+	fmt.Println(" Simulation Complete! ")
 	fmt.Println("============================================================")
 	statsMutex.Lock()
 	fmt.Printf("Statistics:\n")
